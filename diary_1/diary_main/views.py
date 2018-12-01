@@ -79,6 +79,11 @@ def public(request,page):
         for i in range(len(diary_list)):
             dist['diary'+str(i+1)]=diary_list[i]
             dist['url'+str(i+1)]=reverse('public_detail',args=(diary_list[i].id,))
+        if request.method=="POST":
+            for i in range(len(diary_list)):
+                if str(i+1) in request.POST:
+                    dist['diary'+str(i+1)].praise+=1
+                    dist['diary'+str(i+1)].save()
         dist['name']=user.realname
         dist['age']=datetime.datetime.today().year-User.objects.get(id=u_id).birthday.year
         dist['public']=reverse('public',args=(1,))
@@ -257,7 +262,7 @@ def private_edit(request,d_id):
             if 'delete' in request.POST:
                 diary.delete()
                 return HttpResponseRedirect(reverse('private',args=(1,)))
-            if request.POST.get('check_box')=="1":
+            if request.POST.get('checkbox')=="1":
                 diary.public=True
             else:
                 diary.public=False
@@ -311,7 +316,7 @@ def private_edit_new(request):
             diary=Diary(user=user,title=request.POST.get('title'),diary_text=request.POST.get('content'),simp_text=request.POST.get('content')[:100]+'...',public=False)
             mess='private'
             diary.pub_date=datetime.datetime.today()
-            if request.POST.get('check_box')=="1":
+            if request.POST.get('checkbox')=="1":
                 diary.public=True
                 mess='public'
             diary.save()
